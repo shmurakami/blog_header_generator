@@ -1,22 +1,12 @@
 package main
 
-import "fmt"
-import "time"
+import (
+	"fmt"
+	"io/ioutil"
+	"time"
+)
 
 func main() {
-	// 実行すると
-	// 必要な情報をいろいろインタラクティブに聞いてきて
-	// (初期値) で
-	// _postsにファイルを吐き出してくれるだけ で良い
-	// title, description, date, filename
-	// とりあえずこれだけでいい
-
-	// 必要なもの
-	// 入力待ち ok
-	// ファイル生成
-	// ファイルの重複検知
-	// とりあえずこんなもん？
-
 	//h := header{
 	//	title:       "foo",
 	//	description: "brah brah",
@@ -39,15 +29,46 @@ func main() {
 
 	scans := map[string]string{}
 
-	var temp string
+	var stdin string
 	for k, v := range h {
+		stdin = ""
 		fmt.Printf("%s? (%s): ", k, v)
-		temp = v
-		fmt.Scan(&temp)
-		fmt.Println(temp)
-		scans[k] = temp
+		fmt.Scan(&stdin)
+		if stdin == "" {
+			stdin = v
+		}
+		fmt.Println(stdin)
+		scans[k] = stdin
 	}
 
 	fmt.Println(scans)
 
+	makeFile(scans)
+}
+
+func makeFile(headers map[string]string) error {
+	directory := "./_posts"
+	filename := headers["filename"]
+	output := fmt.Sprintf("%s/%s", directory, filename)
+
+	// check if file exsists or not
+	_, error := ioutil.ReadFile(output)
+	if error == nil {
+		// how to return new error?
+		return nil
+	}
+
+	h := fmt.Sprintf("---\nlayout: post\nposted: %s\ntitle: %s\ndescription: %s\n---\n\n",
+		headers["date"],
+		headers["title"],
+		headers["description"],
+	)
+	vec := []byte(h)
+
+	err := ioutil.WriteFile(output, vec, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
