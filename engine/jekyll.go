@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var now = time.Now()
+
 type Jekyll struct {
 	Title       string
 	Description string
@@ -56,7 +58,8 @@ description: %s
 }
 
 func today() string {
-	year, month, day := time.Now().Date()
+	//year, month, day := time.Now().Date()
+	year, month, day := now.Date()
 	y := fmt.Sprintf("%04d", year)
 	m := fmt.Sprintf("%02d", month)
 	d := fmt.Sprintf("%02d", day)
