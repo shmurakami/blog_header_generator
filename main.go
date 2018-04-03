@@ -2,73 +2,45 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"time"
+	"log"
+
+	"./engine"
 )
 
 func main() {
-	//h := header{
-	//	title:       "foo",
-	//	description: "brah brah",
-	//	date:        "2018-04-02",
-	//	filename:    "test",
-	//}
+	// TODO get output path from option
 
-	h := map[string]string{
-		"title":       "foo",
-		"description": "brah brah",
-		"date":        "2018-04-02",
-		"filename":    "test",
+	jekyll := engine.New()
+
+	// actually want to ask/set dynamically to support another blog template engine in future
+	// seems golang does not support dynamic value get/set without reflection
+	// for now support only jekyll
+
+	title := ask("Title", jekyll.Title)
+	description := ask("Description", jekyll.Description)
+	date := ask("Date", jekyll.Date)
+	filename := ask("Filename", jekyll.Filename)
+	jekyll.Title = title
+	jekyll.Description = description
+	jekyll.Date = date
+	jekyll.Filename = filename
+
+	err := jekyll.Output("./_posts")
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	year, month, day := time.Now().Date()
-	m := fmt.Sprintf("%02d", month)
-	d := fmt.Sprintf("%02d", day)
-
-	fmt.Printf("Today is %d-%s-%s\n", year, m, d)
-
-	scans := map[string]string{}
-
-	var stdin string
-	for k, v := range h {
-		stdin = ""
-		fmt.Printf("%s? (%s): ", k, v)
-		fmt.Scan(&stdin)
-		if stdin == "" {
-			stdin = v
-		}
-		fmt.Println(stdin)
-		scans[k] = stdin
-	}
-
-	fmt.Println(scans)
-
-	makeFile(scans)
+	fmt.Println("File generated")
 }
 
-func makeFile(headers map[string]string) error {
-	directory := "./_posts"
-	filename := headers["filename"]
-	output := fmt.Sprintf("%s/%s", directory, filename)
+func ask(t, initial string) string {
+	stdin := ""
+	fmt.Printf("%s?(%s) :", t, initial)
+	fmt.Scanln(&stdin)
+	fmt.Println("")
 
-	// check if file exsists or not
-	_, error := ioutil.ReadFile(output)
-	if error == nil {
-		// how to return new error?
-		return nil
+	if stdin == "" {
+		return initial
 	}
-
-	h := fmt.Sprintf("---\nlayout: post\nposted: %s\ntitle: %s\ndescription: %s\n---\n\n",
-		headers["date"],
-		headers["title"],
-		headers["description"],
-	)
-	vec := []byte(h)
-
-	err := ioutil.WriteFile(output, vec, 0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return stdin
 }
