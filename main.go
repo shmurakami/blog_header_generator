@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"./engine"
+	"github.com/shmurakami/blog_header_generator/engine"
 )
 
 func main() {
@@ -16,14 +16,10 @@ func main() {
 	// seems golang does not support dynamic value get/set without reflection
 	// for now support only jekyll
 
-	title := ask("Title", jekyll.Title)
-	description := ask("Description", jekyll.Description)
-	date := ask("Date", jekyll.Date)
-	filename := ask("Filename", jekyll.Filename)
-	jekyll.Title = title
-	jekyll.Description = description
-	jekyll.Date = date
-	jekyll.Filename = filename
+	jekyll.Title = ask("Title", jekyll.Title)
+	jekyll.Description = ask("Description", jekyll.Description)
+	jekyll.Date = ask("Date", jekyll.Date)
+	jekyll.Filename = ask("Filename", jekyll.Filename)
 
 	err := jekyll.Output("./_posts")
 	if err != nil {
@@ -35,9 +31,8 @@ func main() {
 
 func ask(t, initial string) string {
 	stdin := ""
-	fmt.Printf("%s?(%s) :", t, initial)
+	fmt.Printf("%s? (%s): ", t, initial)
 	fmt.Scanln(&stdin)
-	fmt.Println("")
 
 	if stdin == "" {
 		return initial
