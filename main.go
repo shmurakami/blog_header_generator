@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"log"
+	"os"
 
 	"github.com/shmurakami/blog_header_generator/engine"
 )
@@ -48,15 +50,15 @@ func main() {
 }
 
 func ask(t, initial string) (string, error) {
-	stdin := ""
 	fmt.Printf("%s? (%s): ", t, initial)
-	_, err := fmt.Scanln(&stdin)
+	b, _, err := bufio.NewReader(os.Stdin).ReadLine()
 	if err != nil {
 		return "", err
 	}
+	line := string(b)
 
-	if stdin == "" {
+	if line == "" {
 		return initial, nil
 	}
-	return stdin, nil
+	return line, nil
 }
