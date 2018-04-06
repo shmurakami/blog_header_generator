@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -29,7 +30,7 @@ func New() *Jekyll {
 
 func (j *Jekyll) Output(directory string) error {
 	filename := j.filename()
-	output := fmt.Sprintf("%s/%s", directory, filename)
+	output := filepath.Join(directory, filename)
 
 	// check if file already exsists
 	_, error := ioutil.ReadFile(output)
