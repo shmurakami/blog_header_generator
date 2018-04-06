@@ -38,7 +38,7 @@ func (j *Jekyll) Output(directory string) error {
 		return errors.New("File exists")
 	}
 
-	pattern := `---
+	format := `---
 layout: post
 posted: %s
 title: %s
@@ -47,7 +47,7 @@ description: %s
 
 `
 
-	h := fmt.Sprintf(pattern, j.Date, j.Title, j.Description)
+	h := fmt.Sprintf(format, j.Date, j.Title, j.Description)
 	vec := []byte(h)
 
 	err := ioutil.WriteFile(output, vec, 0644)
