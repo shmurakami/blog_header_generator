@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -73,7 +74,15 @@ func today() string {
 	return today
 }
 
+func normalize(s string) string {
+	return regexp.MustCompile("[^\\p{L}\\d_]+").ReplaceAllString(s, "_")
+}
+
 func (j *Jekyll) filename() string {
+	if j.Filename == "" {
+		j.Filename = normalize(j.Title)
+	}
+
 	// jekyll post file must has date prefix
 	hasPrefix := strings.HasPrefix(j.Filename, j.Date)
 	if hasPrefix == false {
