@@ -33,8 +33,8 @@ func (j *Jekyll) Output(directory string) error {
 	output := filepath.Join(directory, filename)
 
 	// check if file already exsists
-	_, error := ioutil.ReadFile(output)
-	if error == nil {
+	_, err := ioutil.ReadFile(output)
+	if err == nil {
 		return errors.New("File exists")
 	}
 
