@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -28,16 +30,20 @@ func New() *Jekyll {
 }
 
 func (j *Jekyll) Output(directory string) error {
+	if _, err := time.Parse("2006-01-02", j.Date); err != nil {
+		return err
+	}
+
 	filename := j.filename()
-	output := fmt.Sprintf("%s/%s", directory, filename)
+	output := filepath.Join(directory, filename)
 
 	// check if file already exsists
-	_, error := ioutil.ReadFile(output)
-	if error == nil {
+	_, err := ioutil.ReadFile(output)
+	if err == nil {
 		return errors.New("File exists")
 	}
 
-	pattern := `---
+	format := `---
 layout: post
 posted: %s
 title: %s
@@ -46,10 +52,10 @@ description: %s
 
 `
 
-	h := fmt.Sprintf(pattern, j.Date, j.Title, j.Description)
+	h := fmt.Sprintf(format, j.Date, j.Title, j.Description)
 	vec := []byte(h)
 
-	err := ioutil.WriteFile(output, vec, 0644)
+	err = ioutil.WriteFile(output, vec, 0644)
 	if err != nil {
 		return err
 	}
@@ -68,7 +74,15 @@ func today() string {
 	return today
 }
 
+func normalize(s string) string {
+	return regexp.MustCompile("[^\\p{L}\\d_]+").ReplaceAllString(s, "_")
+}
+
 func (j *Jekyll) filename() string {
+	if j.Filename == "" {
+		j.Filename = normalize(j.Title)
+	}
+
 	// jekyll post file must has date prefix
 	hasPrefix := strings.HasPrefix(j.Filename, j.Date)
 	if hasPrefix == false {

@@ -1,13 +1,17 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"log"
+	"os"
+	"strings"
 
 	"github.com/shmurakami/blog_header_generator/engine"
 )
 
-func main() {
+func generate() error {
 	// TODO get output path from option
 
 	jekyll := engine.New()
@@ -16,26 +20,46 @@ func main() {
 	// seems golang does not support dynamic value get/set without reflection
 	// for now support only jekyll
 
-	jekyll.Title = ask("Title", jekyll.Title)
-	jekyll.Description = ask("Description", jekyll.Description)
-	jekyll.Date = ask("Date", jekyll.Date)
-	jekyll.Filename = ask("Filename", jekyll.Filename)
+	var err error
+	if jekyll.Title, err = ask("Title", jekyll.Title); err != nil {
+		return err
+	}
+	if jekyll.Description, err = ask("Description", jekyll.Description); err != nil {
+		return err
+	}
+	if jekyll.Date, err = ask("Date", jekyll.Date); err != nil {
+		return err
+	}
+	if jekyll.Filename, err = ask("Filename", jekyll.Filename); err != nil {
+		return err
+	}
 
-	err := jekyll.Output("./_posts")
+	err = jekyll.Output("./_posts")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	fmt.Println("File generated")
+	return nil
 }
 
-func ask(t, initial string) string {
-	stdin := ""
-	fmt.Printf("%s? (%s): ", t, initial)
-	fmt.Scanln(&stdin)
-
-	if stdin == "" {
-		return initial
+func main() {
+	err := generate()
+	if err != nil && err != io.EOF {
+		log.Fatal(err)
 	}
-	return stdin
+}
+
+func ask(t, initial string) (string, error) {
+	fmt.Printf("%s? (%s): ", t, initial)
+	b, _, err := bufio.NewReader(os.Stdin).ReadLine()
+	if err != nil {
+		return "", err
+	}
+	line := strings.TrimSpace(string(b))
+
+	if line == "" {
+		return initial, nil
+	}
+	return line, nil
 }
