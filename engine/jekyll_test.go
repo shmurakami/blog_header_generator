@@ -20,13 +20,13 @@ func TestFilename(t *testing.T) {
 	j := New()
 	j.Filename = "test"
 	result := j.filename()
-	if result != "2018-01-02-test" {
+	if result != "2018-01-02-test.md" {
 		t.Fatal("failed auto prefix failename")
 	}
 
 	j.Filename = "2018-01-02-manual"
 	result = j.filename()
-	if result != "2018-01-02-manual" {
+	if result != "2018-01-02-manual.md" {
 		t.Fatal("failed manual prefix filename")
 	}
 }

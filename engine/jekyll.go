@@ -70,9 +70,15 @@ func today() string {
 
 func (j *Jekyll) filename() string {
 	// jekyll post file must has date prefix
-	has := strings.HasPrefix(j.Filename, j.Date)
-	if has {
-		return j.Filename
+	hasPrefix := strings.HasPrefix(j.Filename, j.Date)
+	if hasPrefix == false {
+		j.Filename = fmt.Sprintf("%s-%s", j.Date, j.Filename)
 	}
-	return fmt.Sprintf("%s-%s", j.Date, j.Filename)
+
+	// filename must has markdown extension
+	hasExtension := strings.HasSuffix(j.Filename, ".md")
+	if hasExtension == false {
+		j.Filename = fmt.Sprintf("%s.md", j.Filename)
+	}
+	return j.Filename
 }
