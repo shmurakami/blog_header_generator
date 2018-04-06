@@ -29,6 +29,10 @@ func New() *Jekyll {
 }
 
 func (j *Jekyll) Output(directory string) error {
+	if _, err := time.Parse("2006-01-02", j.Date); err != nil {
+		return err
+	}
+
 	filename := j.filename()
 	output := filepath.Join(directory, filename)
 
@@ -50,7 +54,7 @@ description: %s
 	h := fmt.Sprintf(format, j.Date, j.Title, j.Description)
 	vec := []byte(h)
 
-	err := ioutil.WriteFile(output, vec, 0644)
+	err = ioutil.WriteFile(output, vec, 0644)
 	if err != nil {
 		return err
 	}
