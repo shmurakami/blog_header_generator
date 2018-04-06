@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/shmurakami/blog_header_generator/engine"
 )
@@ -55,7 +56,7 @@ func ask(t, initial string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	line := string(b)
+	line := strings.TrimSpace(string(b))
 
 	if line == "" {
 		return initial, nil
